@@ -1,7 +1,15 @@
 const mongoose = require("mongoose");
+const slug = require("mongoose-slug-updater");
+mongoose.plugin(slug);
+
 const citySchema = new mongoose.Schema(
   {
-    cityName: String,
+    CityName:String,
+    slug: {
+      type: String,
+      slug: "CityName",  // Dựa vào CityName để tạo slug
+      unique: true
+    },
     deleted: {
       type: Boolean,
       default: false,
@@ -12,5 +20,6 @@ const citySchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 const City = mongoose.model("City", citySchema, "city");
 module.exports = City;

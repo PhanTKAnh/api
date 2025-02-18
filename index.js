@@ -1,14 +1,23 @@
 const express = require("express");
 require('dotenv').config();
-const app = express();
-const port = 3001;
-const databse = require("./config/database");
+var bodyParser = require('body-parser')
 var cors = require('cors')
-databse.connect();
+const databse = require("./config/database");
+
 
 const routeClient = require("./api/v1/routes/index.route");
+
+const app = express();
+const port = process.env.PORT;
+
 app.use(cors())
 
+databse.connect();
+
+// parse application/json
+app.use(bodyParser.json())
+
+// Routes Version 1 
 routeClient(app);
 
 app.listen(port, () => {
