@@ -47,8 +47,49 @@ module.exports.search = async (req, res) => {
             }
         }
 
-        const jobs = await Job.find(query);
-        res.json(jobs);
+        const jobs = await Job.find(query).lean();
+
+        const cities = await City.find({
+            deleted: false
+        });
+        const dataCity = cities.reduce((acc, city) => ({ ...acc, [city._id]: city.CityName }), {});
+        const companies = await Company.find({
+            Status: "active",
+            deleted: false
+        })
+        const dataCompany = companies.reduce((acc, company) => ({
+            ...acc, [company._id]: {
+                name: company.CompanyName,
+                logo: company.logo
+            }
+        }), {});
+
+        const tags = await Tag.find({
+            deleted: false
+        });
+        const dataTag = tags.reduce((acc, tag) => ({
+            ...acc,
+            [tag._id]: tag.TagsName
+        }), {})
+
+
+        const newJobs = jobs.map(({ IdTags, IdCompany, IdCity, ...job }) => ({
+            ...job,
+            tag: IdTags.map(tagId => ({
+                id: tagId,
+                TagsName: dataTag[tagId]
+            })),
+            company: {
+                id: IdCompany,
+                CompanyName: dataCompany[IdCompany]?.name,
+                avatar: dataCompany[IdCompany]?.avatar
+            },
+            cities: IdCity?.map(cityId => ({
+                id: cityId,
+                CityName: dataCity[cityId]
+            })),
+        }))
+        res.json(newJobs);
 
     } catch (error) {
         console.error(error);
