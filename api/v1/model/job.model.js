@@ -6,11 +6,11 @@ mongoose.plugin(slug);
 const jobSchema = new mongoose.Schema(
   {
     IdCity: {
-      type: [String], // Chứa nhiều ID của thành phố
+      type: [String],
       default: []
     },
     IdTags: {
-      type: [String], // Chứa nhiều ID của thẻ
+      type: [String], 
       default: []
     },
     IdCompany: {
@@ -44,7 +44,6 @@ const jobSchema = new mongoose.Schema(
     },
     Status: {
       type: String,
-      enum: ["open", "closed"], 
       default: "open"
     },
     Level: {

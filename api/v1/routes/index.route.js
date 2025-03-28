@@ -4,6 +4,10 @@ const CompanyRoute = require("./company.route")
 const TagRoute = require("./tag.route")
 const SearchRoute = require("./search.route")
 const CandidateRoute = require("./candidate.route")
+const FavoriteJobRoute = require("./favorite-jobs.route")
+const ApplicationsRoute = require("./applications.route")
+const candidateMidlleware = require("../middlewares/candidate.middleware")
+const uploadFileRoute = require("./uploadFile.route")
 module.exports = (app) =>{
     app.use("/cities", CityRoute)
     app.use("/jobs", JobsRoute)
@@ -11,4 +15,8 @@ module.exports = (app) =>{
     app.use("/tags", TagRoute)
     app.use("/search", SearchRoute)
     app.use("/candidate", CandidateRoute)
+    app.use("/application", ApplicationsRoute)
+    app.use("/upload-file",uploadFileRoute)
+    
+    app.use("/favorite",candidateMidlleware.requireCandidate, FavoriteJobRoute)
 }

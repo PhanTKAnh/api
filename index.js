@@ -14,7 +14,7 @@ const port = process.env.PORT;
 const allowedOrigins = [
   "http://localhost:3000", // Cho phép chạy local
   "https://it-carer.vercel.app" // Thay bằng domain thực tế của bạn trên Vercel
-];
+]; 
 
 app.use(cors({
   origin: allowedOrigins,

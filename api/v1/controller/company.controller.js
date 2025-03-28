@@ -50,7 +50,7 @@ module.exports.detail = async (req, res) => {
             slug: slugPamram,
             deleted: false,
             Status: "active"
-        }).select("-Password -Token").lean();
+        }).select("-Password ").lean();
 
         const cities = await City.find({
             deleted:false

@@ -10,7 +10,7 @@ module.exports.search = async (req, res) => {
         const keyword = req.query.keyword;
         const cityParam = req.query.city ? req.query.city.split(",") : [];
         const tagParam = req.query.tag ? req.query.tag.split(",") : [];
-        const levelParam = req.query.level;
+        const levelParam = req.query.level; 
         const experienceParam = req.query.experience;
         const salaryParam = req.query.salary;
         const educationParam = req.query.education;
@@ -168,7 +168,7 @@ module.exports.search = async (req, res) => {
             company: {
                 id: IdCompany,
                 CompanyName: dataCompany[IdCompany]?.name,
-                avatar: dataCompany[IdCompany]?.avatar
+                logo: dataCompany[IdCompany]?.logo
             },
             cities: IdCity?.map(cityId => ({
                 id: cityId,

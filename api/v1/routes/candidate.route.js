@@ -8,6 +8,9 @@ router.post("/login", controller.login);
 router.get("/profie",candidateMidlleware.requireCandidate, controller.profile);
 router.post("/reset/forgotPassword",controller.forgotPassword);
 router.post("/reset/otpPassword",controller.otpPassword);
-router.post("/reset/resetPassword",candidateMidlleware.requireCandidate,controller.resetPassword)
+router.post("/reset/resetPassword",candidateMidlleware.requireCandidate,controller.resetPassword);
+router.post("/refresh-token", controller.refreshToken);
+router.patch("/change-password",candidateMidlleware.requireCandidate, controller.changePassword);
+
 
 module.exports = router;

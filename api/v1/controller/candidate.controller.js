@@ -10,7 +10,8 @@ const sendMailHelper = require("../../../helpers/sendEmail");
 module.exports.register = async (req, res) => {
     try {
         const Password = await bcrypt.hash(req.body.Password, saltRounds);
-        const existEmail = await Candidate.findOne({ Email: req.body.Email, deleted: false });
+        const Email = req.body.Email;
+        const existEmail = await Candidate.findOne({ Email: Email, deleted: false });
 
         if (existEmail) {
             return res.json({ code: 400, message: "Email đã tồn tại" });
@@ -31,8 +32,16 @@ module.exports.register = async (req, res) => {
             email: candidate.Email,
             name: candidate.Name,
         });
-
-        return res.json({ code: 200, message: "Đăng ký thành công", tokenCandidate: token });
+        const refreshToken = jwtHelper.generateRefreshToken({
+            idCandidate: candidate._id,
+            email: candidate.Email,
+        });
+        return res.json({
+            code: 200,
+            message: "Đăng ký thành công",
+            tokenCandidate: token,
+            refreshToken :refreshToken 
+        });
     } catch (error) {
         return res.status(500).json({ code: 500, message: "Lỗi server", error: error.message });
     }
@@ -42,13 +51,14 @@ module.exports.register = async (req, res) => {
 module.exports.login = async (req, res) => {
     try {
         const Email = req.body.Email;
+        const Password = req.body.Password
         const candidate = await Candidate.findOne({ Email: Email, deleted: false });
 
         if (!candidate) {
             return res.json({ code: 401, message: "Sai email hoặc mật khẩu!" });
         }
 
-        const isPasswordMatch = await bcrypt.compare(req.body.Password, candidate.Password);
+        const isPasswordMatch = await bcrypt.compare(Password, candidate.Password);
         if (!isPasswordMatch) {
             return res.json({ code: 401, message: "Sai email hoặc mật khẩu!" });
         }
@@ -58,12 +68,47 @@ module.exports.login = async (req, res) => {
             email: candidate.Email,
             name: candidate.Name,
         });
+        const refreshToken = jwtHelper.generateRefreshToken({
+            idCandidate: candidate._id,
+            email: candidate.Email,
+        });
 
-        return res.json({ code: 200, message: "Đăng nhập thành công!", tokenCandidate: token });
+        return res.json({ code: 200, message: "Đăng nhập thành công!", tokenCandidate: token ,refreshTokenCandidate: refreshToken});
     } catch (error) {
         return res.status(500).json({ code: 500, message: "Lỗi server", error: error.message });
     }
 };
+// [POST] /candidate/reset/refreshToken
+module.exports.refreshToken = async (req, res) => {
+    try {
+        const refreshTokenCandidate = req.body.refreshTokenCandidate;
+
+        if (!refreshTokenCandidate) {
+            return res.json({ code: 401, message: "Không có refresh token" });
+        }
+
+        const decoded = jwtHelper.verifyRefreshToken(refreshTokenCandidate);
+
+        if (!decoded) {
+            return res.json({ code: 403, message: "Refresh token không hợp lệ" });
+        }
+
+        // Tạo access token mới
+        const newToken = jwtHelper.generateToken({
+            idCandidate: decoded.idCandidate,
+            email: decoded.email,
+        });
+
+        return res.json({
+            code: 200,
+            message: "Làm mới token thành công!",
+            tokenCandidate: newToken,
+        });
+    } catch (error) {
+        return res.json({ code: 500, message: "Lỗi server", error: error.message });
+    }
+};
+
 
 // [GET] /candidate/profile
 module.exports.profile = async (req, res) => {
@@ -130,12 +175,16 @@ module.exports.otpPassword = async (req, res) => {
             email: candidate.Email,
             name: candidate.Name,
         });
-
+        const refreshToken = jwtHelper.generateRefreshToken({
+            idCandidate: candidate._id,
+            email: candidate.Email,
+        });
 
         res.json({
             code: 200,
             message: "Xác thực thành công",
-            tokenCandidate: token
+            tokenCandidate: token ,
+            refreshTokenCandidate: refreshToken
         })
 
     } catch (error) {
@@ -159,3 +208,38 @@ module.exports.resetPassword = async (req, res) => {
         return res.status(500).json({ code: 500, message: "Lỗi server", error: error.message });
     }
 }
+// [POST] /candidate/change-password
+
+module.exports.changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const candidateId = req.candidate?.id; 
+
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ code: 400, message: "Thiếu thông tin mật khẩu" });
+        }
+
+        // Kiểm tra xem user có tồn tại không
+        const candidate = await Candidate.findById(candidateId);
+        if (!candidate) {
+            return res.status(404).json({ code: 404, message: "Người dùng không tồn tại" });
+        }
+
+        // Kiểm tra mật khẩu cũ có chính xác không
+        const isMatch = await bcrypt.compare(oldPassword, candidate.Password);
+        if (!isMatch) {
+            return res.status(400).json({ code: 400, message: "Mật khẩu cũ không chính xác" });
+        }
+
+        // Mã hóa mật khẩu mới
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Cập nhật mật khẩu mới vào database
+        candidate.Password = hashedPassword;
+        await candidate.save();
+
+        return res.status(200).json({ code: 200, message: "Đổi mật khẩu thành công" });
+    } catch (error) {
+        return res.status(500).json({ code: 500, message: "Lỗi server", error: error.message });
+    }
+};
