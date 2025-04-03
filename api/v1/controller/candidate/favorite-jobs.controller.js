@@ -1,6 +1,6 @@
-const Company = require("../model/company.model");
-const FavoriteJob = require("../model/favorite-job.model");
-const Job = require("../model/job.model");
+const Company = require("../../model/company.model");
+const FavoriteJob = require("../../model/favorite-job.model");
+const Job = require("../../model/job.model");
 
 // [GET] /favorite
 module.exports.index = async (req, res) => {

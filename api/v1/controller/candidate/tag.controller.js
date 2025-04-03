@@ -1,5 +1,5 @@
-const Job = require("../model/job.model");
-const Tag = require("../model/tag.model");
+const Job = require("../../model/job.model");
+const Tag = require("../../model/tag.model");
 
 // [GET] /tags
 module.exports.index = async (req, res) => {

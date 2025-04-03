@@ -1,9 +1,9 @@
-const { convertToSlug } = require("../../../helpers/convertToSlug");
-const City = require("../model/city.model");
-const Company = require("../model/company.model");
-const FavoriteJob = require("../model/favorite-job.model");
-const Job = require("../model/job.model");
-const Tag = require("../model/tag.model");
+const { convertToSlug } = require("../../../../helpers/convertToSlug");
+const City = require("../../model/city.model");
+const Company = require("../../model/company.model");
+const FavoriteJob = require("../../model/favorite-job.model");
+const Job = require("../../model/job.model");
+const Tag = require("../../model/tag.model");
 
 
 // [GET] /jobs

@@ -6,7 +6,7 @@ const SearchRoute = require("./search.route")
 const CandidateRoute = require("./candidate.route")
 const FavoriteJobRoute = require("./favorite-jobs.route")
 const ApplicationsRoute = require("./applications.route")
-const candidateMidlleware = require("../middlewares/candidate.middleware")
+const candidateMidlleware = require("../../middlewares/candidate.middleware")
 const uploadFileRoute = require("./uploadFile.route")
 module.exports = (app) =>{
     app.use("/cities", CityRoute)

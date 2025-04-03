@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controller/job.controller");
-const candidateMidlleware = require("../middlewares/candidate.middleware")
+const candidateMidlleware = require("../../middlewares/candidate.middleware")
 
+
+const controller = require("../../controller/candidate/job.controller");
 
 router.get("/",candidateMidlleware.checkCandidate, controller.index);
 router.get("/detailJob/:slugJob",candidateMidlleware.checkCandidate, controller.detailJob);

@@ -1,10 +1,10 @@
-const Candidate = require("../model/candidate.model");
-const jwtHelper = require("../../../helpers/jwt.helper");
+const Candidate = require("../../model/candidate.model");
+const jwtHelper = require("../../../../helpers/jwt.helper");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const generateHelper = require("../../../helpers/generate");
-const ForgotPassword = require("../model/forgotPassword.model");
-const sendMailHelper = require("../../../helpers/sendEmail");
+const generateHelper = require("../../../../helpers/generate");
+const ForgotPassword = require("../..//model/forgotPassword.model");
+const sendMailHelper = require("../../../../helpers/sendEmail");
 
 // [POST] /candidate/register
 module.exports.register = async (req, res) => {
@@ -209,26 +209,25 @@ module.exports.resetPassword = async (req, res) => {
     }
 }
 // [POST] /candidate/change-password
-
 module.exports.changePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
         const candidateId = req.candidate?.id; 
 
         if (!oldPassword || !newPassword) {
-            return res.status(400).json({ code: 400, message: "Thiếu thông tin mật khẩu" });
+            return res.json({ code: 400, message: "Thiếu thông tin mật khẩu" });
         }
 
         // Kiểm tra xem user có tồn tại không
         const candidate = await Candidate.findById(candidateId);
         if (!candidate) {
-            return res.status(404).json({ code: 404, message: "Người dùng không tồn tại" });
+            return res.json({ code: 404, message: "Người dùng không tồn tại" });
         }
 
         // Kiểm tra mật khẩu cũ có chính xác không
         const isMatch = await bcrypt.compare(oldPassword, candidate.Password);
         if (!isMatch) {
-            return res.status(400).json({ code: 400, message: "Mật khẩu cũ không chính xác" });
+            return res.json({ code: 400, message: "Mật khẩu cũ không chính xác" });
         }
 
         // Mã hóa mật khẩu mới
@@ -238,7 +237,35 @@ module.exports.changePassword = async (req, res) => {
         candidate.Password = hashedPassword;
         await candidate.save();
 
-        return res.status(200).json({ code: 200, message: "Đổi mật khẩu thành công" });
+        return res.json({ code: 200, message: "Đổi mật khẩu thành công" });
+    } catch (error) {
+        return res.json({ code: 500, message: "Lỗi server", error: error.message });
+    }
+};
+// [PATCH] /candidate/profile
+module.exports.patchProfile = async (req, res) => {
+    try {
+        const candidateId = req.candidate.id; // Lấy ID ứng viên từ middleware
+        const updates = req.body; // Dữ liệu cập nhật gửi từ client
+
+        // Kiểm tra xem ứng viên có tồn tại không
+        const candidate = await Candidate.findById(candidateId);
+        if (!candidate) {
+            return res.status(404).json({ code: 404, message: "Ứng viên không tồn tại" });
+        }
+
+        // Cập nhật thông tin ứng viên
+        Object.keys(updates).forEach((key) => {
+            candidate[key] = updates[key];
+        });
+
+        await candidate.save(); // Lưu thay đổi vào database
+
+        return res.status(200).json({
+            code: 200,
+            message: "Cập nhật thông tin thành công",
+            data: candidate,
+        });
     } catch (error) {
         return res.status(500).json({ code: 500, message: "Lỗi server", error: error.message });
     }

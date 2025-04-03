@@ -1,6 +1,6 @@
-const Applications = require("../model/application.model");
-const Company = require("../model/company.model");
-const Job = require("../model/job.model");
+const Applications = require("../../model/application.model");
+const Company = require("../../model/company.model");
+const Job = require("../../model/job.model");
 // [POST]
 module.exports.application = async (req, res) => {
     try {
@@ -9,6 +9,11 @@ module.exports.application = async (req, res) => {
         if (!req.body.LinkCV) {
             return res.json({code:400, message: "Thiếu thông tin bắt buộc" });
         }
+                const existingApplication = await Applications.findOne({ IdCandidate: idCandidate, IdJob:req.body.IdJob });
+
+                if (existingApplication) {
+                    return res.status(400).json({ code: 400, message: "Bạn đã ứng tuyển công việc này rồi!" });
+                }
 
         const application = new Applications({
             IdCandidate: idCandidate,

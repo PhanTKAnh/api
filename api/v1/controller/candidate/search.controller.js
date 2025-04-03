@@ -1,7 +1,8 @@
-const City = require("../model/city.model");
-const Company = require("../model/company.model");
-const Job = require("../model/job.model");
-const Tag = require("../model/tag.model");
+const City = require("../../model/city.model");
+const Company = require("../../model/company.model");
+const FavoriteJob = require("../../model/favorite-job.model");
+const Job = require("../../model/job.model");
+const Tag = require("../../model/tag.model");
 
 
 //[GET] / search
@@ -159,7 +160,7 @@ module.exports.search = async (req, res) => {
         }), {})
 
 
-        const newJobs = jobs.map(({ IdTags, IdCompany, IdCity, ...job }) => ({
+       let newJobs = jobs.map(({ IdTags, IdCompany, IdCity, ...job }) => ({
             ...job,
             tag: IdTags.map(tagId => ({
                 id: tagId,
@@ -175,7 +176,22 @@ module.exports.search = async (req, res) => {
                 CityName: dataCity[cityId]
             })),
         }))
-        res.json(newJobs);
+       // Nếu có ứng viên đăng nhập, kiểm tra xem job nào là yêu thích
+       if (req.candidate) {
+        const idCandidate = req.candidate.id;
+
+        const favoriteJobs = await FavoriteJob.find({
+            IdCandidate: idCandidate
+        });
+        const favoriteJobIds = new Set(favoriteJobs.map(job => job.IdJob.toString()));
+
+        newJobs = newJobs.map(job => ({
+            ...job,
+            isFavoriteJob: favoriteJobIds.has(job._id.toString())
+        }));
+    }
+
+    res.json(newJobs);
 
     } catch (error) {
         console.error(error);

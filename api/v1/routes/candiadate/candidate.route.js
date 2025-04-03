@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controller/candidate.controller");
-const candidateMidlleware = require("../middlewares/candidate.middleware")
+const candidateMidlleware = require("../../middlewares/candidate.middleware")
+
+
+const controller = require("../../controller/candidate/candidate.controller");
 
 router.post("/register", controller.register);
 router.post("/login", controller.login);
-router.get("/profie",candidateMidlleware.requireCandidate, controller.profile);
+router.get("/profile",candidateMidlleware.requireCandidate, controller.profile);
+router.patch("/profile",candidateMidlleware.requireCandidate, controller.patchProfile);
 router.post("/reset/forgotPassword",controller.forgotPassword);
 router.post("/reset/otpPassword",controller.otpPassword);
 router.post("/reset/resetPassword",candidateMidlleware.requireCandidate,controller.resetPassword);

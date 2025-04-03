@@ -1,4 +1,4 @@
-const City = require("../model/city.model");
+const City = require("../../model/city.model");
 
 // [GET] /cities
 module.exports.index =async (req, res) => {

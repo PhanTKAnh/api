@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controller/tag.controller");
+
+const controller = require("../../controller/candidate/city.controller");
 
 router.get("/", controller.index);
 

@@ -1,6 +1,6 @@
-const City = require("../model/city.model");
-const Company = require("../model/company.model");
-const Job = require("../model/job.model");
+const City = require("../../model/city.model");
+const Company = require("../../model/company.model");
+const Job = require("../../model/job.model");
 
 
 // [GET] /companies
@@ -9,7 +9,7 @@ module.exports.index = async (req, res) => {
         const companies = await Company.find({
             Status: "active",
             deleted: false
-        }).select("_id CompanyName avatar slug").lean();
+        }).select("_id CompanyName avatar slug logo").lean();
 
         const jobs = await Job.find({
             Status:"open",

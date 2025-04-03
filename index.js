@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const databse = require("./config/database");
 
 
-const routeClient = require("./api/v1/routes/index.route");
+const routeCandidate = require("./api/v1/routes/candiadate/index.route");
 
 const app = express();
 const port = process.env.PORT;
@@ -31,7 +31,7 @@ app.use(cookieParser('DBVFWFGVSGH'));
 
 
 // Routes Version 1 
-routeClient(app);
+routeCandidate(app);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);

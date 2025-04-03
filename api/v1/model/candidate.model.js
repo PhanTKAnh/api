@@ -1,26 +1,49 @@
 const mongoose = require("mongoose");
-const slug = require('mongoose-slug-updater')
+const slug = require("mongoose-slug-updater");
+
 mongoose.plugin(slug);
+
 const candidateSchema = new mongoose.Schema(
   {
-    FullName: String,
-    avatar:String,
-    Email: String,
-    PhoneNumber: String,
-    BirthDate: Date ,
-    Gender:String,
-    token:String,
-    Password: String,
-    Address:String,
-    deleted: {
+    FullName:  String,
+    Avatar: String,
+    Email:  String,
+    PhoneNumber: Number,
+
+    BirthDate: {
+      type: Date,
+      validate: {
+        validator: function (value) {
+          return value <= new Date();
+        },
+        message: "Ngày sinh không hợp lệ",
+      },
+    },
+    Gender:  String,
+    Password: String,  
+    Address:  String,
+    Deleted: {
       type: Boolean,
       default: false,
     },
-    deletedAt: Date,
+    DeletedAt: {
+      type: Date,
+      default: null,
+    },
+    Slug: {
+      type: String,
+      slug: "FullName",
+      unique: true,
+    },
+    RegisteredAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
   }
 );
-const Candidate  = mongoose.model("Candidate", candidateSchema, "candidate");
+
+const Candidate = mongoose.model("Candidate", candidateSchema, "candidate");
 module.exports = Candidate;
